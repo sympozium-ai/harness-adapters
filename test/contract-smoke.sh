@@ -8,7 +8,8 @@ trap 'rm -rf "$work"' EXIT
 mkdir -p "$work/ipc/output" "$work/home" "$work/tmp"
 # Docker bind mounts preserve host ownership.  The production pod supplies
 # writable emptyDirs to UID 1000, so mirror that contract explicitly on CI.
-chmod 0777 "$work/ipc/output" "$work/home" "$work/tmp"
+# The parent is also a bind-mount path and must be searchable by that UID.
+chmod 0777 "$work" "$work/ipc" "$work/ipc/output" "$work/home" "$work/tmp"
 
 set +e
 docker run --rm --read-only --user 1000:1000 \
