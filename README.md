@@ -1,2 +1,50 @@
-# harness-adapters
+# Sympozium harness adapters
+
+Versioned, conformance-tested adapter images for running external agent
+harnesses as the primary process of a Sympozium `AgentRun`.
+
+This repository is intentionally separate from the Sympozium control plane.
+An adapter image pins a harness release, translates the versioned Sympozium
+contract, and is reviewed/scanned/published independently. Sympozium never
+downloads a harness dynamically inside an AgentRun and users never provide an
+arbitrary image directly to a run.
+
+## Support tiers
+
+| Adapter | Tier | Status |
+|---|---|---|
+| `reference` | Maintained fixture | Deterministic v1alpha1 contract smoke test; no model call. |
+| `pi` | Experimental example | Planned adapter for [Pi Coding Agent](https://github.com/earendil-works/pi). |
+| `hermes` | Experimental example | Planned adapter for [Hermes Agent](https://github.com/NousResearch/hermes-agent). |
+
+Experimental means the image is not published or selectable until it passes
+the conformance suite and a real cluster smoke test. It is not a claim of
+upstream endorsement or support.
+
+## How an adapter is built
+
+1. Pin an upstream release by immutable source revision and package checksum.
+2. Build a minimal, non-root adapter image in CI; do not run an upstream
+   installer at AgentRun startup.
+3. Translate `TASK`, model configuration, MCP registry, and supported policy
+   controls into the harness's native invocation.
+4. Emit the Sympozium result protocol and pass conformance.
+5. Publish a multi-architecture image by digest. An operator approves that
+   digest through `AgentRuntime` and `SympoziumPolicy`.
+
+See [the adapter contract](docs/adapter-contract.md) and the individual
+[Pi](adapters/pi/README.md) and [Hermes](adapters/hermes/README.md) plans.
+
+## Installing an example
+
+Examples are opt-in. The future Helm/UI starter flow creates, in the selected
+namespace, a narrow policy, one `AgentRuntime`, and an optional smoke AgentRun.
+It never creates model credentials. The operator selects an existing Secret or
+configures a local endpoint before a real-model smoke test.
+
+## Contributing
+
+Every adapter must declare an owner, upstream revision, supported capabilities,
+credential contract, and conformance evidence. See
+[CONTRIBUTING.md](CONTRIBUTING.md).
 Versioned, conformance-tested adapters for running external agent harnesses on Sympozium
