@@ -32,7 +32,47 @@ cat > "$HERMES_HOME/config.yaml" <<EOF
 model:
   provider: sympozium
 platform_toolsets:
-  cli: []
+  # `no_mcp` is an explicit opt-out from Hermes' global MCP auto-discovery.
+  # No native toolsets are enabled below; the denylist is a final defence
+  # against an upstream platform composite recovering a built-in toolset.
+  cli: [no_mcp]
+agent:
+  disabled_toolsets:
+    - web
+    - search
+    - x_search
+    - vision
+    - video
+    - image_gen
+    - video_gen
+    - computer_use
+    - terminal
+    - skills
+    - browser
+    - cronjob
+    - file
+    - tts
+    - todo
+    - memory
+    - context_engine
+    - session_search
+    - project
+    - bot_room
+    - desktop_ui
+    - clarify
+    - code_execution
+    - delegation
+    - homeassistant
+    - kanban
+    - discord
+    - discord_admin
+    - yuanbao
+    - feishu_doc
+    - feishu_drive
+    - spotify
+    - debugging
+    - safe
+    - coding
 providers:
   sympozium:
     name: sympozium

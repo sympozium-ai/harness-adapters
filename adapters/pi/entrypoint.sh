@@ -33,7 +33,7 @@ jq -n \
   > "$HOME/.pi/agent/models.json"
 
 set +e
-pi --print --no-session --no-skills --no-prompt-templates --provider sympozium --model "$MODEL_NAME" "$TASK" >"$work_path" 2>&1
+pi --print --no-session --no-skills --no-prompt-templates --no-tools --provider sympozium --model "$MODEL_NAME" "$TASK" >"$work_path" 2>&1
 rc=$?
 set -e
 if [ "$rc" -ne 0 ]; then
