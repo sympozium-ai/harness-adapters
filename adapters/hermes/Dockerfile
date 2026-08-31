@@ -14,7 +14,11 @@ RUN apt-get update && \
     git -C /opt/hermes checkout --detach "$HERMES_REVISION" && \
     test "$(git -C /opt/hermes rev-parse HEAD)" = "$HERMES_REVISION" && \
     rm -rf /opt/hermes/.git && \
-    cd /opt/hermes && uv sync --frozen --no-dev && \
+    # Keep the venv interpreter inside the image's world-readable Python
+    # installation.  uv's managed interpreter cache is under /root and an
+    # otherwise executable console script then fails under Sympozium's UID
+    # 1000 security context.
+    cd /opt/hermes && uv sync --frozen --no-dev --python /usr/local/bin/python3.13 && \
     groupadd --gid 1000 agent && \
     useradd --uid 1000 --gid 1000 --create-home --home-dir /home/agent agent
 
