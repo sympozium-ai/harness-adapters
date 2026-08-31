@@ -33,6 +33,10 @@ jobs:
           images: ghcr.io/${{ github.repository }}/${{ matrix.adapter }}
           tags: |
             type=sha,prefix=
+      - name: Build and exercise the contract failure path
+        run: |
+          docker build --load -t adapter-smoke:${{ matrix.adapter }} adapters/${{ matrix.adapter }}
+          ./test/contract-smoke.sh ${{ matrix.adapter }} adapter-smoke:${{ matrix.adapter }}
       - uses: docker/build-push-action@v6
         with:
           context: adapters/${{ matrix.adapter }}
