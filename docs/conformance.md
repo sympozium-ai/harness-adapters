@@ -8,17 +8,19 @@ endorsement by Pi or Nous Research.
 
 | Runtime | Upstream | Approved digest | Contract |
 |---|---|---|---|
-| Pi | `@earendil-works/pi-coding-agent` `0.84.4` | `ghcr.io/sympozium-ai/harness-adapters/pi@sha256:31f85ba7e241f5a4eea8674b45e8a6ec2645cd92c082e9a534868f4425bf64f3` | `v1alpha1` |
-| Hermes | `NousResearch/hermes-agent` `fc0a10a924ce31a7badd0d7a202dcc0779ef7942` | `ghcr.io/sympozium-ai/harness-adapters/hermes@sha256:ac5a40e36ed9cbae435ce185f4266ad6743f759cb36c671f9ff47035f8edafa1` | `v1alpha1` |
+| Pi | `@earendil-works/pi-coding-agent` `0.84.4` | `ghcr.io/sympozium-ai/harness-adapters/pi@sha256:b0d50402dc0a25b2c46f86dbd6b5de963487fa0ffa44058cb324ab2c68934f3b` | `v1alpha1` |
+| Hermes | `NousResearch/hermes-agent` `fc0a10a924ce31a7badd0d7a202dcc0779ef7942` | `ghcr.io/sympozium-ai/harness-adapters/hermes@sha256:df66d30c56e7a82c74b9df1d8ef4034127f017640f460c0d3aa7c15f28550ab4` | `v1alpha1` |
 
 Both images run as UID 1000 with a read-only root filesystem. Each checks the
 contract version, accepts only the run-provided model route and injected
 credential, writes `$SYMPOZIUM_RESULT_PATH`, and emits the stdout result
-marker. Neither writes credentials to output.
+marker. Neither writes credentials to output. Pi is invoked with `--no-tools`.
+Hermes explicitly opts out of global MCP discovery and writes a configuration
+that disables its native toolsets before invoking the model.
 
 ## Automated build checks
 
-[GitHub Actions run 33415921913](https://github.com/sympozium-ai/harness-adapters/actions/runs/33415921913)
+[GitHub Actions run 33426656198](https://github.com/sympozium-ai/harness-adapters/actions/runs/33426656198)
 built both images, then executed each in a read-only container as UID 1000
 with only simulated Sympozium writable mounts. The unreachable-endpoint smoke
 must fail and write a well-formed error result; it prevents an adapter from
@@ -31,9 +33,9 @@ namespace and a policy that listed each full image digest:
 
 | AgentRun | Runtime source | Result | Recorded digest |
 |---|---|---|---|
-| `pi-real-call-001` | explicit `pi-v0-84-4` | `pi real call succeeded` | `31f85ba7…bf64f3` |
-| `hermes-real-call-002` | explicit `hermes-v0-20-6` | `hermes real call succeeded` | `ac5a40e3…edafa1` |
-| `pi-inherited-call-001` | `Agent.spec.runtimeRef` | `inherited Pi run succeeded` | `31f85ba7…bf64f3` |
+| `pi-real-call-002` | explicit `pi-v0-84-4` | `pi hardened call succeeded` | `b0d50402…934f3b` |
+| `hermes-real-call-004` | explicit `hermes-v0-20-6` | `hermes final hardened call succeeded` | `df66d30c…550ab4` |
+| `pi-inherited-call-002` | `Agent.spec.runtimeRef` | `inherited hardened Pi succeeded` | `b0d50402…934f3b` |
 
 All three used the Framework's existing scoped local-model Secret and the
 OpenAI-compatible Qwen endpoint. The completed runs remain with `cleanup:

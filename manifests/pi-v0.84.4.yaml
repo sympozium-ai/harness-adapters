@@ -5,7 +5,7 @@ kind: AgentRuntime
 metadata:
   name: pi-v0-84-4
 spec:
-  image: ghcr.io/sympozium-ai/harness-adapters/pi@sha256:31f85ba7e241f5a4eea8674b45e8a6ec2645cd92c082e9a534868f4425bf64f3
+  image: ghcr.io/sympozium-ai/harness-adapters/pi@sha256:b0d50402dc0a25b2c46f86dbd6b5de963487fa0ffa44058cb324ab2c68934f3b
   contractVersion: v1alpha1
   supportOwner: sympozium-maintainers
   conformance:
