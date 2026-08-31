@@ -39,10 +39,23 @@ capabilities are recorded in [the conformance report](docs/conformance.md).
 
 ## Installing an example
 
-Examples are opt-in. The future Helm/UI starter flow creates, in the selected
-namespace, a narrow policy, one `AgentRuntime`, and an optional smoke AgentRun.
-It never creates model credentials. The operator selects an existing Secret or
-configures a local endpoint before a real-model smoke test.
+Examples are opt-in. Apply an `AgentRuntime` in the target namespace, then
+select it on an Agent in Sympozium's Create Agent flow (or set
+`Agent.spec.runtimeRef`). The adapter never creates model credentials; select
+an existing scoped model Secret when you create the Agent or run.
+
+```sh
+kubectl -n <namespace> apply -f \
+  https://raw.githubusercontent.com/sympozium-ai/harness-adapters/main/manifests/pi-v0.84.4.yaml
+# or: manifests/hermes-v0.20.6.yaml
+```
+
+Before applying either manifest, an administrator must add its **full image
+digest** from the manifest to that namespace's
+`SympoziumPolicy.spec.imagePolicy.allowedRegistries`. This is intentionally a
+separate action: installing an adapter must not broaden image admission or
+grant model credentials. The runtime will show as ready only after policy and
+CRD validation complete.
 
 ## Contributing
 

@@ -1,0 +1,14 @@
+# Apply in the namespace where the operator has approved the exact image
+# digest in its SympoziumPolicy.imagePolicy.allowedRegistries list.
+apiVersion: sympozium.ai/v1alpha1
+kind: AgentRuntime
+metadata:
+  name: pi-v0-84-4
+spec:
+  image: ghcr.io/sympozium-ai/harness-adapters/pi@sha256:31f85ba7e241f5a4eea8674b45e8a6ec2645cd92c082e9a534868f4425bf64f3
+  contractVersion: v1alpha1
+  supportOwner: sympozium-maintainers
+  conformance:
+    status: conformant
+    owner: sympozium-maintainers
+    reference: https://github.com/sympozium-ai/harness-adapters/blob/main/docs/conformance.md

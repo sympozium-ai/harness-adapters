@@ -1,0 +1,14 @@
+# Apply in the namespace where the operator has approved the exact image
+# digest in its SympoziumPolicy.imagePolicy.allowedRegistries list.
+apiVersion: sympozium.ai/v1alpha1
+kind: AgentRuntime
+metadata:
+  name: hermes-v0-20-6
+spec:
+  image: ghcr.io/sympozium-ai/harness-adapters/hermes@sha256:ac5a40e36ed9cbae435ce185f4266ad6743f759cb36c671f9ff47035f8edafa1
+  contractVersion: v1alpha1
+  supportOwner: sympozium-maintainers
+  conformance:
+    status: conformant
+    owner: sympozium-maintainers
+    reference: https://github.com/sympozium-ai/harness-adapters/blob/main/docs/conformance.md
