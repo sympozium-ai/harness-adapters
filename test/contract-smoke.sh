@@ -6,6 +6,9 @@ image="$2"
 work="$(mktemp -d)"
 trap 'rm -rf "$work"' EXIT
 mkdir -p "$work/ipc/output" "$work/home" "$work/tmp"
+# Docker bind mounts preserve host ownership.  The production pod supplies
+# writable emptyDirs to UID 1000, so mirror that contract explicitly on CI.
+chmod 0777 "$work/ipc/output" "$work/home" "$work/tmp"
 
 set +e
 docker run --rm --read-only --user 1000:1000 \
