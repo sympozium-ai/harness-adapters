@@ -4,7 +4,10 @@ set -eu
 adapter="$1"
 image="$2"
 work="$(mktemp -d)"
-trap 'rm -rf "$work"' EXIT
+# Image tooling can create nested files as a mapped container UID.  This is a
+# disposable test directory; failure to remove a host-owned cache must not
+# hide the contract assertion above.
+trap 'rm -rf "$work" 2>/dev/null || true' EXIT
 mkdir -p "$work/ipc/output" "$work/home" "$work/tmp"
 # Docker bind mounts preserve host ownership.  The production pod supplies
 # writable emptyDirs to UID 1000, so mirror that contract explicitly on CI.
