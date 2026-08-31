@@ -1,0 +1,54 @@
+# Adapter conformance evidence
+
+This record covers the first experimental, stateless adapter release. It is
+evidence for the Sympozium adapter contract, not an assertion of upstream
+endorsement by Pi or Nous Research.
+
+## Images
+
+| Runtime | Upstream | Approved digest | Contract |
+|---|---|---|---|
+| Pi | `@earendil-works/pi-coding-agent` `0.84.4` | `ghcr.io/sympozium-ai/harness-adapters/pi@sha256:31f85ba7e241f5a4eea8674b45e8a6ec2645cd92c082e9a534868f4425bf64f3` | `v1alpha1` |
+| Hermes | `NousResearch/hermes-agent` `fc0a10a924ce31a7badd0d7a202dcc0779ef7942` | `ghcr.io/sympozium-ai/harness-adapters/hermes@sha256:ac5a40e36ed9cbae435ce185f4266ad6743f759cb36c671f9ff47035f8edafa1` | `v1alpha1` |
+
+Both images run as UID 1000 with a read-only root filesystem. Each checks the
+contract version, accepts only the run-provided model route and injected
+credential, writes `$SYMPOZIUM_RESULT_PATH`, and emits the stdout result
+marker. Neither writes credentials to output.
+
+## Automated build checks
+
+[GitHub Actions run 33415921913](https://github.com/sympozium-ai/harness-adapters/actions/runs/33415921913)
+built both images, then executed each in a read-only container as UID 1000
+with only simulated Sympozium writable mounts. The unreachable-endpoint smoke
+must fail and write a well-formed error result; it prevents an adapter from
+claiming success without a model call.
+
+## Framework evidence
+
+On the Framework cluster, under the isolated `sympozium-harness-e2e`
+namespace and a policy that listed each full image digest:
+
+| AgentRun | Runtime source | Result | Recorded digest |
+|---|---|---|---|
+| `pi-real-call-001` | explicit `pi-v0-84-4` | `pi real call succeeded` | `31f85ba7…bf64f3` |
+| `hermes-real-call-002` | explicit `hermes-v0-20-6` | `hermes real call succeeded` | `ac5a40e3…edafa1` |
+| `pi-inherited-call-001` | `Agent.spec.runtimeRef` | `inherited Pi run succeeded` | `31f85ba7…bf64f3` |
+
+All three used the Framework's existing scoped local-model Secret and the
+OpenAI-compatible Qwen endpoint. The completed runs remain with `cleanup:
+keep` in that namespace for inspection. Both `AgentRuntime` objects reached
+`Ready=True` and are marked `conformant` after these runs.
+
+## Explicitly unsupported in this release
+
+The two adapters declare no capabilities. In particular, they do **not**
+implement MCP/SkillPack tools, tool filtering, persona/system-prompt mapping,
+resume, subagents, or persistent Hermes learning. A run requesting any such
+capability must be rejected rather than silently accepting a policy the
+adapter cannot honour.
+
+MCP support needs a separate implementation that converts
+`MCP_CONFIG_PATH` to the upstream harness's configuration and an allow/deny
+conformance suite. Do not treat the successful model-call evidence above as
+evidence for that future feature.

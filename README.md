@@ -34,6 +34,8 @@ or support.
 
 See [the adapter contract](docs/adapter-contract.md) and the individual
 [Pi](adapters/pi/README.md) and [Hermes](adapters/hermes/README.md) plans.
+The current experimental conformance evidence and intentionally unsupported
+capabilities are recorded in [the conformance report](docs/conformance.md).
 
 ## Installing an example
 
