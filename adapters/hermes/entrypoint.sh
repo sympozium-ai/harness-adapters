@@ -3,6 +3,7 @@ set -eu
 
 result_path="${SYMPOZIUM_RESULT_PATH:-/ipc/output/result.json}"
 work_path="${TMPDIR:-/tmp}/hermes-output.txt"
+usage_path="${TMPDIR:-/tmp}/hermes-usage.json"
 
 emit() {
   status="$1"
@@ -42,12 +43,16 @@ providers:
 EOF
 
 set +e
-hermes --ignore-rules --provider sympozium --model "$MODEL_NAME" --oneshot "$TASK" >"$work_path" 2>&1
+hermes --ignore-rules --provider sympozium --model "$MODEL_NAME" --usage-file "$usage_path" --oneshot "$TASK" >"$work_path" 2>&1
 rc=$?
 set -e
 if [ "$rc" -ne 0 ]; then
   fail "Hermes exited ${rc}: $(tail -c 2000 "$work_path")"
 fi
+[ -r "$usage_path" ] || fail "Hermes did not produce a usage report"
+jq -e --arg model "$MODEL_NAME" \
+  '(.completed == true) and (.failed == false) and ((.api_calls // 0) > 0) and (.model == $model)' \
+  "$usage_path" >/dev/null || fail "Hermes did not complete a verified model call"
 response="$(cat "$work_path")"
 [ -n "$response" ] || fail "Hermes returned an empty response"
 emit success "$response"
