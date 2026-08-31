@@ -1,13 +1,18 @@
 # Pi adapter (experimental)
 
-Target upstream: [earendil-works/pi](https://github.com/earendil-works/pi),
-specifically the `@earendil-works/pi-coding-agent` package.
+Upstream: [earendil-works/pi](https://github.com/earendil-works/pi),
+`@earendil-works/pi-coding-agent` `0.84.4`.
 
-Before implementation, pin an upstream release and lockfile integrity value;
-the Dockerfile must install that exact package with lifecycle scripts disabled
-unless a reviewed exception is documented. The adapter must map Sympozium's
-task, configured model endpoint/credential, and MCP registry into Pi without
-mounting host state or a user home directory.
+The adapter installs the exact package with lifecycle scripts disabled. It
+creates Pi's provider configuration under the run's ephemeral `$HOME`, maps
+`MODEL_BASE_URL`, `MODEL_NAME`, and the injected `OPENAI_API_KEY` to an
+OpenAI-compatible provider, and invokes `pi --print --no-tools`.
 
-Required evidence before publication: contract conformance, real model smoke,
-SkillPack MCP allow/deny smoke, credential scope review, and support owner.
+Capabilities: none. This first release deliberately does not expose Pi tools,
+MCP, persona, or resume. It runs as UID 1000 with a read-only root filesystem;
+only the run-provided `$HOME`, `/workspace`, `/tmp`, and result mount are
+writable. The model key is written neither to logs nor to the image.
+
+Publication still requires contract conformance, a real model smoke, credential
+scope review, and support owner. MCP/SkillPack support is a later capability,
+not implied by this image.

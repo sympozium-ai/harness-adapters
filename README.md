@@ -14,12 +14,12 @@ arbitrary image directly to a run.
 | Adapter | Tier | Status |
 |---|---|---|
 | `reference` | Maintained fixture | Deterministic v1alpha1 contract smoke test; no model call. |
-| `pi` | Experimental example | Planned adapter for [Pi Coding Agent](https://github.com/earendil-works/pi). |
-| `hermes` | Experimental example | Planned adapter for [Hermes Agent](https://github.com/NousResearch/hermes-agent). |
+| `pi` | Experimental | Image implementation in review; not yet published or registered. |
+| `hermes` | Experimental | Image implementation in review; not yet published or registered. |
 
-Experimental means the image is not published or selectable until it passes
-the conformance suite and a real cluster smoke test. It is not a claim of
-upstream endorsement or support.
+Experimental means the image is not selectable until it passes the contract
+suite and a real cluster smoke test. It is not a claim of upstream endorsement
+or support.
 
 ## How an adapter is built
 
