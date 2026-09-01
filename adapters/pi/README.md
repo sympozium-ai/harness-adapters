@@ -18,7 +18,10 @@ persistent session. In that mode it starts a private `openai-chat` HTTP
 endpoint and serializes Pi turns through a named Pi session file; it still
 disables tools, skills, and prompt templates. The endpoint is intended solely
 for Sympozium's authenticated API proxy and is not an ingress or a general
-purpose OpenAI gateway.
+purpose OpenAI gateway. Requests with `stream: true` receive standard
+OpenAI-style server-sent event chunks as Pi writes stdout; non-streaming
+requests retain the normal JSON completion response. Both paths are bounded to
+2 MiB of adapter output.
 
 Publication still requires contract conformance, a real model smoke, credential
 scope review, and support owner. MCP/SkillPack support is a later capability,
