@@ -32,7 +32,8 @@ marked supported solely because it builds.
 A persistent runtime declares `contractVersion: v1alpha2` and
 `spec.session.protocol: openai-chat` in its approved `AgentRuntime`. The
 container listens only on the declared port and implements `POST
-/v1/chat/completions`. Sympozium creates a private ClusterIP Service and its
+/v1/chat/completions` plus an unauthenticated `GET /healthz` readiness probe.
+Sympozium creates a private ClusterIP Service and its
 authenticated API server is the only supported proxy; adapters must not expose
 their own ingress, browser token, Kubernetes service-account access, or NATS
 access.
