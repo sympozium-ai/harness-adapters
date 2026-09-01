@@ -7,6 +7,7 @@ RUN mkdir -p /home/agent /workspace && \
     chown -R 1000:1000 /home/agent /workspace
 
 COPY --chmod=0755 entrypoint.sh /usr/local/bin/sympozium-pi-adapter
+COPY --chmod=0755 session-server.mjs /usr/local/bin/sympozium-pi-session
 
 USER 1000:1000
 ENV HOME=/home/agent
