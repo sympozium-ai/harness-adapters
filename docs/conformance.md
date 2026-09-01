@@ -36,11 +36,19 @@ namespace and a policy that listed each full image digest:
 | `pi-real-call-002` | explicit `pi-v0-84-4` | `pi hardened call succeeded` | `b0d50402…934f3b` |
 | `hermes-real-call-004` | explicit `hermes-v0-20-6` | `hermes final hardened call succeeded` | `df66d30c…550ab4` |
 | `pi-inherited-call-002` | `Agent.spec.runtimeRef` | `inherited hardened Pi succeeded` | `b0d50402…934f3b` |
+| `pi-real-call-20260901` | explicit `pi-v0-84-4` | `pi real adapter verified 20260901` | `b0d50402…934f3b` |
+| `hermes-real-call-20260901` | explicit `hermes-v0-20-6` | `hermes real adapter verified 20260901` | `df66d30c…550ab4` |
 
-All three used the Framework's existing scoped local-model Secret and the
+All five used the Framework's existing scoped local-model Secret and the
 OpenAI-compatible Qwen endpoint. The completed runs remain with `cleanup:
 keep` in that namespace for inspection. Both `AgentRuntime` objects reached
 `Ready=True` and are marked `conformant` after these runs.
+
+The two 2026-09-01 runs are fresh end-to-end evidence for the supported
+**one-shot** path: a real model response travelled through each adapter and
+the platform recorded the runtime reference, digest, contract, and structured
+result. They do not establish interactive/persistent sessions, streaming, MCP,
+native tools, or any other capability the adapters do not declare.
 
 ## Explicitly unsupported in this release
 
