@@ -19,6 +19,9 @@ emit() {
 
 fail() { emit error "$1"; exit 1; }
 
+if [ "${SYMPOZIUM_HARNESS_CONTRACT_VERSION:-}" = v1alpha2 ]; then
+  exec node /usr/local/bin/sympozium-pi-session
+fi
 [ "${SYMPOZIUM_HARNESS_CONTRACT_VERSION:-}" = v1alpha1 ] || fail "unsupported harness contract"
 [ -n "${TASK:-}" ] || fail "no task supplied"
 [ -n "${MODEL_NAME:-}" ] || fail "no model supplied"
