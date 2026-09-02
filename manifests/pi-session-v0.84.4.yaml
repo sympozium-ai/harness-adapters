@@ -2,9 +2,9 @@
 apiVersion: sympozium.ai/v1alpha1
 kind: AgentRuntime
 metadata:
-  name: hermes-session-v0-20-6
+  name: pi-session-v0-84-4
 spec:
-  image: ghcr.io/sympozium-ai/harness-adapters/hermes@sha256:70c643b287b4a74583c7fedafd60e853579a36380a652a3d39ab0ae8c86e2d3b
+  image: ghcr.io/sympozium-ai/harness-adapters/pi@sha256:8c8f0df071dc5307b3b557e0233a70757d8a4be17cb688c1ca725cb41001bbd5
   contractVersion: v1alpha2
   session:
     protocol: openai-chat

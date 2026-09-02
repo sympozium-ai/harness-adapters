@@ -4,11 +4,11 @@ This record covers the first experimental, stateless adapter release. It is
 evidence for the Sympozium adapter contract, not an assertion of upstream
 endorsement by Pi or Nous Research.
 
-Hermes `v1alpha2` persistent-session support is published and has completed
-real-cluster conformance. Its local smoke verifies
-the bounded private HTTP surface, serialized multi-turn transcript state,
-restart-safe atomic persistence, health probe, and SSE response framing using
-a deterministic fake Hermes executable. It is not yet a published default.
+Pi and Hermes `v1alpha2` persistent-session support is published, installed by
+Sympozium's default interactive catalog, and has completed real-cluster
+conformance. Local smokes verify the bounded private HTTP surfaces, multi-turn
+state, restart persistence, health probes, SSE framing, and child-process
+cancellation after a client disconnect.
 
 ## Images
 
@@ -16,7 +16,8 @@ a deterministic fake Hermes executable. It is not yet a published default.
 |---|---|---|---|
 | Pi | `@earendil-works/pi-coding-agent` `0.84.4` | `ghcr.io/sympozium-ai/harness-adapters/pi@sha256:b0d50402dc0a25b2c46f86dbd6b5de963487fa0ffa44058cb324ab2c68934f3b` | `v1alpha1` |
 | Hermes | `NousResearch/hermes-agent` `fc0a10a924ce31a7badd0d7a202dcc0779ef7942` | `ghcr.io/sympozium-ai/harness-adapters/hermes@sha256:df66d30c56e7a82c74b9df1d8ef4034127f017640f460c0d3aa7c15f28550ab4` | `v1alpha1` |
-| Hermes session | `NousResearch/hermes-agent` `fc0a10a924ce31a7badd0d7a202dcc0779ef7942` | `ghcr.io/sympozium-ai/harness-adapters/hermes@sha256:bdbf6f8fae5f282af8008e0a2c2aef398b8c2146185a32365db8ae7599b833be` | `v1alpha2` |
+| Pi session | `@earendil-works/pi-coding-agent` `0.84.4` | `ghcr.io/sympozium-ai/harness-adapters/pi@sha256:8c8f0df071dc5307b3b557e0233a70757d8a4be17cb688c1ca725cb41001bbd5` | `v1alpha2` |
+| Hermes session | `NousResearch/hermes-agent` `fc0a10a924ce31a7badd0d7a202dcc0779ef7942` | `ghcr.io/sympozium-ai/harness-adapters/hermes@sha256:70c643b287b4a74583c7fedafd60e853579a36380a652a3d39ab0ae8c86e2d3b` | `v1alpha2` |
 
 Both images run as UID 1000 with a read-only root filesystem. Each checks the
 contract version, accepts only the run-provided model route and injected
@@ -80,8 +81,9 @@ conversation as explicit context. Requests are serialized and writes are
 atomic. Streaming clients receive valid SSE framing after the verified Hermes
 call completes; this adapter does not claim token-by-token upstream streaming.
 
-GitHub Actions run 33615171452 built, exercised, and published the immutable
-image above. On 2026-09-02, `hermes-persistent-chat-e2e-chat` reached Ready on
+GitHub Actions run 33618677594 built, exercised, and published both immutable
+session images above, including process-level disconnect cancellation. On
+2026-09-02, `hermes-persistent-chat-e2e-chat` reached Ready on
 Framework and used the cluster-local Qwen endpoint through the existing scoped
 model credential. It stored `hermes-framework-1788342178`, the pod was deleted
 and recreated, and the next real model turn returned that exact token from the
@@ -89,5 +91,9 @@ PVC-backed transcript. The namespace AgentRun count remained `18 → 18`.
 
 The session pod ran without a service-account token, used the controller-owned
 private Service, PVC, and NetworkPolicy, and retained the existing session
-boundary that omits NATS. SSE framing and process-restart continuity are also
-covered by `test/hermes-session-smoke.sh`.
+boundary that omits NATS. The full live Sympozium suite subsequently passed for
+both Pi and Hermes: automatic deterministic session creation, real chat,
+streaming, client-disconnect cancellation, pod restart and stop/resume state,
+idle shutdown, failure diagnostics, deletion, and unchanged AgentRun counts.
+Local adapter coverage lives in `test/pi-session-smoke.sh` and
+`test/hermes-session-smoke.sh`.
