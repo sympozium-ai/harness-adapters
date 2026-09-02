@@ -23,6 +23,7 @@ RUN apt-get update && \
     useradd --uid 1000 --gid 1000 --create-home --home-dir /home/agent agent
 
 COPY --chmod=0755 entrypoint.sh /usr/local/bin/sympozium-hermes-adapter
+COPY --chmod=0755 session-server.py /usr/local/bin/sympozium-hermes-session
 
 USER 1000:1000
 WORKDIR /workspace

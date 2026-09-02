@@ -4,6 +4,12 @@ This record covers the first experimental, stateless adapter release. It is
 evidence for the Sympozium adapter contract, not an assertion of upstream
 endorsement by Pi or Nous Research.
 
+Hermes `v1alpha2` persistent-session support is implemented but remains
+**pending publication and real-cluster conformance**. Its local smoke verifies
+the bounded private HTTP surface, serialized multi-turn transcript state,
+restart-safe atomic persistence, health probe, and SSE response framing using
+a deterministic fake Hermes executable. It is not yet a published default.
+
 ## Images
 
 | Runtime | Upstream | Approved digest | Contract |
@@ -62,3 +68,18 @@ MCP support needs a separate implementation that converts
 `MCP_CONFIG_PATH` to the upstream harness's configuration and an allow/deny
 conformance suite. Do not treat the successful model-call evidence above as
 evidence for that future feature.
+
+## Pending Hermes persistent-session evidence
+
+The Hermes image now has a fail-closed `v1alpha2` mode implementing the
+`openai-chat` session protocol. It stores at most 200 transcript turns beneath
+`/tmp/hermes-sessions`, which Sympozium mounts on the session PVC, and invokes
+the existing verified, tool-disabled one-shot model surface with the bounded
+conversation as explicit context. Requests are serialized and writes are
+atomic. Streaming clients receive valid SSE framing after the verified Hermes
+call completes; this adapter does not claim token-by-token upstream streaming.
+
+Before the runtime is added to Sympozium's default catalog, CI must publish an
+immutable image digest and Framework must prove two real turns, pod restart
+continuity, stop/resume continuity, SSE termination, no AgentRun creation, and
+the existing credential/network isolation invariants.
