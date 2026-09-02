@@ -44,6 +44,8 @@ jobs:
         run: |
           if [ "${{ matrix.adapter }}" = hermes ]; then
             ./test/hermes-session-smoke.sh
+          else
+            ./test/pi-session-smoke.sh
           fi
           docker build --load -t adapter-smoke:${{ matrix.adapter }} adapters/${{ matrix.adapter }}
           ./test/contract-smoke.sh ${{ matrix.adapter }} adapter-smoke:${{ matrix.adapter }}

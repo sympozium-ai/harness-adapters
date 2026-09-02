@@ -4,7 +4,9 @@
 import json
 import os
 import re
+import select
 import signal
+import socket
 import subprocess
 import threading
 import time
@@ -73,7 +75,7 @@ def prompt_with_history(turns, prompt):
     return "\n".join(lines)
 
 
-def run_hermes(prompt, session_id):
+def run_hermes(prompt, session_id, connection):
     global ACTIVE_CHILD
     usage_path = SESSION_DIR / f"{session_id}-usage-{uuid.uuid4().hex}.json"
     command = [
@@ -87,14 +89,22 @@ def run_hermes(prompt, session_id):
             stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=False,
         )
         output = bytearray()
-        while True:
-            chunk = ACTIVE_CHILD.stdout.read(65_536)
-            if not chunk:
-                break
-            output.extend(chunk)
-            if len(output) > MAX_OUTPUT:
+        while ACTIVE_CHILD.poll() is None:
+            readable, _, _ = select.select([ACTIVE_CHILD.stdout, connection], [], [], 0.25)
+            if connection in readable and connection.recv(1, socket.MSG_PEEK) == b"":
                 ACTIVE_CHILD.terminate()
                 ACTIVE_CHILD.wait(timeout=5)
+                raise ValueError("request cancelled")
+            if ACTIVE_CHILD.stdout in readable:
+                chunk = os.read(ACTIVE_CHILD.stdout.fileno(), 65_536)
+                output.extend(chunk)
+                if len(output) > MAX_OUTPUT:
+                    ACTIVE_CHILD.terminate()
+                    ACTIVE_CHILD.wait(timeout=5)
+                    raise ValueError("adapter output exceeded 2 MB")
+        while chunk := os.read(ACTIVE_CHILD.stdout.fileno(), 65_536):
+            output.extend(chunk)
+            if len(output) > MAX_OUTPUT:
                 raise ValueError("adapter output exceeded 2 MB")
         ACTIVE_CHILD.wait()
         text = output.decode("utf-8", errors="replace").strip()
@@ -162,7 +172,7 @@ class Handler(BaseHTTPRequestHandler):
             session_id = requested_id if isinstance(requested_id, str) and SESSION_ID.fullmatch(requested_id) else "default"
             with LOCK:
                 turns = load_transcript(session_id)
-                response = run_hermes(prompt_with_history(turns, prompt), session_id)
+                response = run_hermes(prompt_with_history(turns, prompt), session_id, self.connection)
                 save_transcript(session_id, turns + [{"role": "user", "content": prompt}, {"role": "assistant", "content": response}])
             completion_id = f"chatcmpl-{uuid.uuid4()}"
             created = int(time.time())
