@@ -20,8 +20,7 @@ emit() {
 
 fail() { emit error "$1"; exit 1; }
 
-[ "${SYMPOZIUM_HARNESS_CONTRACT_VERSION:-}" = v1alpha1 ] || fail "unsupported harness contract"
-[ -n "${TASK:-}" ] || fail "no task supplied"
+[ "${SYMPOZIUM_HARNESS_CONTRACT_VERSION:-}" = v1alpha1 ] || [ "${SYMPOZIUM_HARNESS_CONTRACT_VERSION:-}" = v1alpha2 ] || fail "unsupported harness contract"
 [ -n "${MODEL_NAME:-}" ] || fail "no model supplied"
 [ -n "${MODEL_BASE_URL:-}" ] || fail "no model endpoint supplied"
 [ -n "${OPENAI_API_KEY:-}" ] || fail "OPENAI_API_KEY is required"
@@ -81,6 +80,12 @@ providers:
     default_model: ${MODEL_NAME}
     transport: chat_completions
 EOF
+
+if [ "${SYMPOZIUM_HARNESS_CONTRACT_VERSION}" = v1alpha2 ]; then
+  exec python3 /usr/local/bin/sympozium-hermes-session
+fi
+
+[ -n "${TASK:-}" ] || fail "no task supplied"
 
 set +e
 hermes --ignore-rules --provider sympozium --model "$MODEL_NAME" --usage-file "$usage_path" --oneshot "$TASK" >"$work_path" 2>&1
