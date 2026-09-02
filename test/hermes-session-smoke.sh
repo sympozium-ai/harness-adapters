@@ -12,6 +12,25 @@ cleanup() {
 trap cleanup EXIT
 
 mkdir -p "$work/bin" "$work/home"
+
+# A session startup error must remain visible in pod logs. v1alpha2 has no
+# one-shot /ipc result mount, so attempting to emit there would mask the cause.
+if entrypoint_error="$(
+  HOME="$work/home" MODEL_NAME=test-model MODEL_BASE_URL=http://model.invalid/v1 \
+    SYMPOZIUM_HARNESS_CONTRACT_VERSION=v1alpha2 \
+    sh "$repo_root/adapters/hermes/entrypoint.sh" 2>&1
+)"; then
+  echo "Hermes session entrypoint unexpectedly accepted a missing API key" >&2
+  exit 1
+fi
+case "$entrypoint_error" in
+  *"OPENAI_API_KEY is required"*) ;;
+  *) echo "Hermes session entrypoint masked its startup error: $entrypoint_error" >&2; exit 1 ;;
+esac
+case "$entrypoint_error" in
+  *"/ipc"*) echo "Hermes session entrypoint attempted one-shot IPC: $entrypoint_error" >&2; exit 1 ;;
+esac
+
 cat > "$work/bin/hermes" <<'EOF'
 #!/bin/sh
 set -eu

@@ -18,7 +18,17 @@ emit() {
   printf '__SYMPOZIUM_RESULT__\n%s\n__SYMPOZIUM_END__\n' "$payload"
 }
 
-fail() { emit error "$1"; exit 1; }
+fail() {
+  # Session runtimes do not mount the one-shot /ipc result path. Preserve the
+  # actual startup error for pod logs instead of masking it with a read-only
+  # filesystem failure while trying to emit an AgentRun result.
+  if [ "${SYMPOZIUM_HARNESS_CONTRACT_VERSION:-}" = v1alpha2 ]; then
+    printf 'sympozium hermes session: %s\n' "$1" >&2
+    exit 1
+  fi
+  emit error "$1"
+  exit 1
+}
 
 [ "${SYMPOZIUM_HARNESS_CONTRACT_VERSION:-}" = v1alpha1 ] || [ "${SYMPOZIUM_HARNESS_CONTRACT_VERSION:-}" = v1alpha2 ] || fail "unsupported harness contract"
 [ -n "${MODEL_NAME:-}" ] || fail "no model supplied"
