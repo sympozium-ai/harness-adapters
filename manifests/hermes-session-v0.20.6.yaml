@@ -1,0 +1,16 @@
+# Apply in a namespace whose SympoziumPolicy permits this exact digest.
+apiVersion: sympozium.ai/v1alpha1
+kind: AgentRuntime
+metadata:
+  name: hermes-session-v0-20-6
+spec:
+  image: ghcr.io/sympozium-ai/harness-adapters/hermes@sha256:bdbf6f8fae5f282af8008e0a2c2aef398b8c2146185a32365db8ae7599b833be
+  contractVersion: v1alpha2
+  session:
+    protocol: openai-chat
+    port: 8080
+  supportOwner: sympozium-maintainers
+  conformance:
+    status: conformant
+    owner: sympozium-maintainers
+    reference: https://github.com/sympozium-ai/harness-adapters/blob/main/docs/conformance.md

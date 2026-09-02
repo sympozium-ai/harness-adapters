@@ -15,7 +15,7 @@ arbitrary image directly to a run.
 |---|---|---|
 | `reference` | Maintained fixture | Deterministic v1alpha1 contract smoke test; no model call. |
 | `pi` | Experimental | Image implementation in review; not yet published or registered. |
-| `hermes` | Experimental | Published v1alpha1 one-shot; v1alpha2 persistent mode pending conformance and publication. |
+| `hermes` | Experimental | Published v1alpha1 one-shot and conformant v1alpha2 persistent session mode. |
 
 Experimental means the image is not selectable until it passes the contract
 suite and a real cluster smoke test. It is not a claim of upstream endorsement

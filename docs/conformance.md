@@ -4,8 +4,8 @@ This record covers the first experimental, stateless adapter release. It is
 evidence for the Sympozium adapter contract, not an assertion of upstream
 endorsement by Pi or Nous Research.
 
-Hermes `v1alpha2` persistent-session support is implemented but remains
-**pending publication and real-cluster conformance**. Its local smoke verifies
+Hermes `v1alpha2` persistent-session support is published and has completed
+real-cluster conformance. Its local smoke verifies
 the bounded private HTTP surface, serialized multi-turn transcript state,
 restart-safe atomic persistence, health probe, and SSE response framing using
 a deterministic fake Hermes executable. It is not yet a published default.
@@ -16,6 +16,7 @@ a deterministic fake Hermes executable. It is not yet a published default.
 |---|---|---|---|
 | Pi | `@earendil-works/pi-coding-agent` `0.84.4` | `ghcr.io/sympozium-ai/harness-adapters/pi@sha256:b0d50402dc0a25b2c46f86dbd6b5de963487fa0ffa44058cb324ab2c68934f3b` | `v1alpha1` |
 | Hermes | `NousResearch/hermes-agent` `fc0a10a924ce31a7badd0d7a202dcc0779ef7942` | `ghcr.io/sympozium-ai/harness-adapters/hermes@sha256:df66d30c56e7a82c74b9df1d8ef4034127f017640f460c0d3aa7c15f28550ab4` | `v1alpha1` |
+| Hermes session | `NousResearch/hermes-agent` `fc0a10a924ce31a7badd0d7a202dcc0779ef7942` | `ghcr.io/sympozium-ai/harness-adapters/hermes@sha256:bdbf6f8fae5f282af8008e0a2c2aef398b8c2146185a32365db8ae7599b833be` | `v1alpha2` |
 
 Both images run as UID 1000 with a read-only root filesystem. Each checks the
 contract version, accepts only the run-provided model route and injected
@@ -69,7 +70,7 @@ MCP support needs a separate implementation that converts
 conformance suite. Do not treat the successful model-call evidence above as
 evidence for that future feature.
 
-## Pending Hermes persistent-session evidence
+## Hermes persistent-session evidence
 
 The Hermes image now has a fail-closed `v1alpha2` mode implementing the
 `openai-chat` session protocol. It stores at most 200 transcript turns beneath
@@ -79,7 +80,14 @@ conversation as explicit context. Requests are serialized and writes are
 atomic. Streaming clients receive valid SSE framing after the verified Hermes
 call completes; this adapter does not claim token-by-token upstream streaming.
 
-Before the runtime is added to Sympozium's default catalog, CI must publish an
-immutable image digest and Framework must prove two real turns, pod restart
-continuity, stop/resume continuity, SSE termination, no AgentRun creation, and
-the existing credential/network isolation invariants.
+GitHub Actions run 33615171452 built, exercised, and published the immutable
+image above. On 2026-09-02, `hermes-persistent-chat-e2e-chat` reached Ready on
+Framework and used the cluster-local Qwen endpoint through the existing scoped
+model credential. It stored `hermes-framework-1788342178`, the pod was deleted
+and recreated, and the next real model turn returned that exact token from the
+PVC-backed transcript. The namespace AgentRun count remained `18 → 18`.
+
+The session pod ran without a service-account token, used the controller-owned
+private Service, PVC, and NetworkPolicy, and retained the existing session
+boundary that omits NATS. SSE framing and process-restart continuity are also
+covered by `test/hermes-session-smoke.sh`.
